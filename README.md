@@ -18,6 +18,8 @@ Here is a an example of a command-line parser, and it'a usage:
 
 class Options : public OptionsBase
 {
+    using super = OptionsBase;
+
 public:
     int first = 1;
 
@@ -30,8 +32,6 @@ public:
     ~Options() override = default;
 
 protected:
-    using super = OptionsBase;
-
     void postParse() override
     {
         super::postParse();
@@ -54,13 +54,13 @@ Notes:
 1. Call the base class constructor with a description and a 'name'. These will appear on the first line of the generated log header (see output below).
 1. Add option definitions in the constructor. See the CLI11 documentation for full details.
 1. In the overridden `postParse()` method call the base class implementation and add any other required processing. In particular, you can throw a `CLI11::ValidationError` exception if option verification fails, and you can add label/text pairs to the generated log header (see output below).
-1. To use the class, create an instance, call `parse(argc, argv)` and then call `logHeader()`. Public variable defined in the class can now be used freely.  
+1. To use the class, create an instance, call `parse(argc, argv)` and then call `logHeader()`. Public variables defined in the class can now be used freely.  
 1. The `spdlog::debug()` call will produce output only if the -v/--verbose option was given.
 
 #### Help output
 
 ```
-...> /options-example -h
+...> ./options-example -h
 
 Option tester
 Usage: Tester [OPTIONS]

@@ -5,6 +5,8 @@
 
 class OptionsBase : public CLI::App
 {
+    using super = CLI::App;
+
 public:
     struct OptionDisplay
     {
@@ -31,8 +33,6 @@ public:
     void logHeader();
 
 protected:
-    using super = CLI::App;
-
     virtual void postParse();
 
     options_display_t m_optionDisplayList;
