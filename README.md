@@ -5,9 +5,6 @@ The `options` library provides the overridable class `OptionsBase` which is deri
 1. Options and option values can be checked and manipulated before the client starts using them.
 1. An informative header can be created and written to the log.
 
-[1]: <https://github.com/CLIUtils/CLI11>
-[2]: <https://github.com/gabime/spdlog>
-
 ### A motivating example
 
 Here is a an example of a command-line parser, and it'a usage:
@@ -20,18 +17,17 @@ class Options : public OptionsBase
 {
     using super = OptionsBase;
 
-public:
+  public:
     int first = 1;
 
-    explicit Options(const std::string& app_name = "")
-            : super("Option tester", app_name)
+    explicit Options(const std::string &app_name = "") : super("Option tester", app_name)
     {
         this->add_option("-f,--first", this->first, "The first argument", true);
     }
 
     ~Options() override = default;
 
-protected:
+  protected:
     void postParse() override
     {
         super::postParse();
@@ -39,23 +35,29 @@ protected:
     }
 };
 
-int main(int argc, const char* argv[])
+int main(int argc, const char *argv[])
 {
-    Options options("Tester");
-    options.parse(argc, argv);
+    Options options;
+    options.parse_args(argc, argv);
     options.logHeader();
-    spdlog::debug("Log level set to debug");
+    spdlog::debug("This is a debug message");
+    spdlog::info("This is an info message. 'first' is actually {}+1", options.first - 1);
+    spdlog::warn("This is a warning message");
     return 0;
 }
 ```
-Notes:
+#### Notes:
 
+Create a class derived from `OptionsBase`
 1. Add public variables for your options (like `first` here). Reference these variables in the option definitions in the constructor.
 1. Call the base class constructor with a description and a 'name'. These will appear on the first line of the generated log header (see output below).
 1. Add option definitions in the constructor. See the CLI11 documentation for full details.
 1. In the overridden `postParse()` method call the base class implementation and add any other required processing. In particular, you can throw a `CLI11::ValidationError` exception if option verification fails, and you can add label/text pairs to the generated log header (see output below).
-1. To use the class, create an instance, call `parse(argc, argv)` and then call `logHeader()`. Public variables defined in the class can now be used freely.  
-1. The `spdlog::debug()` call will produce output only if the -v/--verbose option was given.
+
+Use it a program:
+1. create an instance, call `parse_args(argc, argv)` and then call `logHeader()`. Public variables defined in the options class can now be used freely.  
+1. The `spdlog::debug()` call will produce output only if the `-v/--verbose` option was given.
+1. The `spdlog::info()` call will produce output only if the `-q/--quiet` option was _not_ given.
 
 #### Help output
 
@@ -63,11 +65,14 @@ Notes:
 ...> ./options-example -h
 
 Option tester
-Usage: Tester [OPTIONS]
+Usage: options-example [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit
-  -v,--verbose                Write debug messages to the log
+  -v,--verbose Excludes: --quiet
+                              Write debug messages to the log
+  -q,--quiet Excludes: --verbose
+                              Write only warnings or worse to the log
   -f,--first INT=1            The first argument
 ```
 
@@ -76,23 +81,25 @@ Options:
 ```
 ...> options-example -v -f 42
 
-2020-02-28 16:01:12.519 info     Tester - Option tester
-2020-02-28 16:01:12.519 info       Command line: -v -f 42
-2020-02-28 16:01:12.519 info       First:        42
-2020-02-28 16:01:12.519 debug    Log level set to debug
+2020-10-31 18:23:31.597 info     options-example - Option tester
+2020-10-31 18:23:31.597 info       Command: -v -f 42
+2020-10-31 18:23:31.597 info       First:   42
+2020-10-31 18:23:31.597 debug    This is a debug message
+2020-10-31 18:23:31.597 info     This is an info message. 'first' is actually 41+1
+2020-10-31 18:23:31.597 warning  This is a warning message
 ```
 
 # Prerequisites
 
 The library depends on the following tools:
 
-1. The command-line parser at <https://github.com/CLIUtils/CLI11>.
-1. The logging library at <https://github.com/gabime/spdlog>.
-1. The `filesystem` component of the boost library. This component has been around for a long time, so any version of boost will do. 
+1. A C++17 compliant compiler.
+1. The [CLI11][1] command-line parser.
+1. The [spdlog][2] logging library.
 
 # Building
 
-Get the repository and build it... :relaxed:
+Get the repository, build it and install it
 ```bash
 ...> cd my-projects
 ...> git clone https://github.com/ztarem/options
@@ -103,3 +110,6 @@ Get the repository and build it... :relaxed:
 ...> make
 ...> sudo make install
 ```
+
+[1]: <https://github.com/CLIUtils/CLI11>
+[2]: <https://github.com/gabime/spdlog>

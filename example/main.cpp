@@ -25,9 +25,11 @@ class Options : public OptionsBase
 
 int main(int argc, const char *argv[])
 {
-    Options options("Tester");
-    options.parse(argc, argv);
+    Options options;
+    options.parse_args(argc, argv);
     options.logHeader();
-    spdlog::debug("Log level set to debug");
+    spdlog::debug("This is a debug message");
+    spdlog::info("This is an info message. 'first' is actually {}+1", options.first - 1);
+    spdlog::warn("This is a warning message");
     return 0;
 }
