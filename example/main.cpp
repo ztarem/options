@@ -10,7 +10,7 @@ class Options : public OptionsBase
 
     explicit Options(const std::string &app_name = "") : super("Option tester", app_name)
     {
-        this->add_option("-f,--first", this->first, "The first argument", true);
+      this->add_option("-f,--first", this->first, "The first argument");
     }
 
     ~Options() override = default;

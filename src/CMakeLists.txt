@@ -1,5 +1,5 @@
 add_library(options optionsbase.cpp)
-target_link_libraries(options spdlog::spdlog CLI11::CLI11)
+target_link_libraries(options CONAN_PKG::spdlog CONAN_PKG::cli11)
 add_library(options::options ALIAS options)
 
 target_include_directories(options
